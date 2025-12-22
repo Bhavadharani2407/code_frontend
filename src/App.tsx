@@ -1,50 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-function App() {
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
+interface Todo {
+  name: string;
+}
 
-const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
+const App: React.FC = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState<string>("");
+
+  const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
 
   // Fetch all todos
   const fetchTodos = async () => {
     try {
       const res = await fetch(API_URL);
-      const data = await res.json();
+      if (!res.ok) throw new Error("Failed to fetch todos");
+      const data: Todo[] = await res.json();
       setTodos(data);
     } catch (error) {
-      console.error("Error fetching todos:", error);
+      console.error(error);
     }
   };
 
-  // Add new todo
+  // Add todo
   const addTodo = async () => {
     if (!newTodo.trim()) return;
 
     try {
-      await fetch(API_URL, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newTodo }),
       });
+      if (!res.ok) throw new Error("Failed to add todo");
+
       setNewTodo("");
       fetchTodos();
     } catch (error) {
-      console.error("Error adding todo:", error);
+      console.error(error);
     }
   };
 
   // Delete todo
-  const deleteTodo = async (name) => {
+  const deleteTodo = async (name: string) => {
     try {
-      await fetch(API_URL, {
+      const res = await fetch(API_URL, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
+      if (!res.ok) throw new Error("Failed to delete todo");
+
       fetchTodos();
     } catch (error) {
-      console.error("Error deleting todo:", error);
+      console.error(error);
     }
   };
 
@@ -56,6 +65,7 @@ const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
     <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
       <h1>Todo App</h1>
 
+      {/* Input + Add */}
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
         <input
           type="text"
@@ -69,6 +79,7 @@ const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
         </button>
       </div>
 
+      {/* Todo List */}
       <ul style={{ listStyle: "none", padding: 0 }}>
         {todos.map((todo, index) => (
           <li
@@ -93,6 +104,6 @@ const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
       </ul>
     </div>
   );
-}
+};
 
 export default App;
