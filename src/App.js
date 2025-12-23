@@ -1,98 +1,86 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
+const API_URL = "http://localhost:3000/api/todos";
 
 function App() {
+  const [name, setName] = useState("");
   const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
 
-const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
-
-  // Fetch all todos
+  // Fetch todos
   const fetchTodos = async () => {
-    try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      setTodos(data);
-    } catch (error) {
-      console.error("Error fetching todos:", error);
-    }
-  };
-
-  // Add new todo
-  const addTodo = async () => {
-    if (!newTodo.trim()) return;
-
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newTodo }),
-      });
-      setNewTodo("");
-      fetchTodos();
-    } catch (error) {
-      console.error("Error adding todo:", error);
-    }
-  };
-
-  // Delete todo
-  const deleteTodo = async (name) => {
-    try {
-      await fetch(API_URL, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
-      });
-      fetchTodos();
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-    }
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    setTodos(data);
   };
 
   useEffect(() => {
     fetchTodos();
   }, []);
 
-  return (
-    <div style={{ maxWidth: "500px", margin: "50px auto", textAlign: "center" }}>
-      <h1>Todo App</h1>
+  // Add todo
+  const addTodo = async () => {
+    if (!name) return;
 
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
-        <input
-          type="text"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="Enter new todo"
-          style={{ flex: 1, padding: "10px", fontSize: "16px" }}
-        />
-        <button onClick={addTodo} style={{ padding: "10px 20px", marginLeft: "10px" }}>
-          Add
-        </button>
-      </div>
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const data = await res.json();
+    setTodos(data);
+    setName("");
+  };
+
+  // Delete todo
+  const deleteTodo = async (id) => {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+    setTodos(data);
+  };
+
+  return (
+  <div
+    style={{
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <div style={{ textAlign: "center" }}>
+      <h2>Todo App</h2>
+
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Enter todo"
+      />
+      <button onClick={addTodo}>Add</button>
 
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {todos.map((todo, index) => (
+        {todos.map((todo) => (
           <li
-            key={index}
+            key={todo.id}
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px",
-              borderBottom: "1px solid #ccc",
+              marginTop: "10px",
             }}
           >
-            {todo.name}
-            <button
-              onClick={() => deleteTodo(todo.name)}
-              style={{ color: "red", border: "none", background: "transparent", cursor: "pointer" }}
-            >
-              Delete
-            </button>
+            <span>{todo.name}</span>
+            <button onClick={() => deleteTodo(todo.id)}>Delete</button>
           </li>
         ))}
       </ul>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default App;
