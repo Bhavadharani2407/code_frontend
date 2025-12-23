@@ -8,7 +8,7 @@ const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState<string>("");
 
-  const API_URL = "https://code-backend-t2jr.onrender.com/api/todos";
+  const API_URL = "https://code-backend-4.onrender.com/api/todos";
 
   // Fetch all todos
   const fetchTodos = async () => {
